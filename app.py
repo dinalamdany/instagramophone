@@ -5,6 +5,7 @@ from flask import render_template
 from twilio.util import TwilioCapability
 
 app = Flask(__name__)
+app.config['DEBUG'] = True
 
 @app.route('/')
 def hello():
@@ -18,7 +19,7 @@ def process():
 
 @app.route('/record')
 def record():
-    render_template('record.html')
+    return render_template('record.html')
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
