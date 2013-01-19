@@ -3,9 +3,6 @@ from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
 from urllib import urlopen 
 from xml.dom import minidom
-from random import random
-from sox import do_all
-import requests
 
 import os
 import requests
@@ -30,12 +27,7 @@ def index():
 def process():
     url = request.form['RecordingUrl']
     r = requests.get(url)
-    random_id = int( random() * 10**6 )
-    with open('/tmp/' + str(random_id) + '.wav','rb'):
-        f.write( r.content )
-    file_paths = do_all( random_id )
-    for path in file_paths:
-        upload( path )
+    #process r.content
 
 @app.route('/record', methods=['GET', 'POST'])
 def record():
