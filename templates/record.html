@@ -8,10 +8,8 @@
             var connection=null;
             var token=null;
             $(document).ready(function(){
-			console.log("hey");
                     Twilio.Device.setup("{{token}}", {"debug":true});
                     $("#begin").click(function() {
-			            console.log("begin");
                         Twilio.Device.connect();
                         });
                     $("#end").click(function() {  
@@ -44,8 +42,8 @@
                             });
 
                     function toggleCallStatus(){
-                        $('#call').toggle();
-                        $('#hangup').toggle();
+                        $('#begin').toggle();
+                        $('#end').toggle();
                     }
             });
 </script>
