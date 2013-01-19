@@ -1,0 +1,69 @@
+@charset "utf-8";
+
+.user-head {
+    position: block;
+    width: 940px;
+    margin: 0 auto;
+    background-color: #0ff;
+    padding: 15px 0 10px 0;
+    -webkit-border-radius: 6px;
+       -moz-border-radius: 6px;
+           -border-radius: 6px;
+}
+
+.avatar-box{
+    position: relative;
+    left: 30px;
+    background-color: #000;
+    width: 120px;
+    height: 155px;
+    -webkit-border-radius: 6px;
+       -moz-border-radius: 6px;
+           -border-radius: 6px;
+}
+
+.avatar {
+    width: 110px;
+    height: 110px;
+    margin: 5px;
+}
+
+.edit-profile {
+    width: 110px;
+    margin: 0 5px 5px 5px;
+}
+
+#username {
+    position: relative;
+    top: 75px;
+    left: 10px;
+    font-size: 20px;
+    line-height: 30px;
+    font-weight: bold;
+    font-family: 'freight-sans-pro', 'proxima-nova', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.head-buttons {
+    position: relative;
+    top: 100px;
+    left: 20px;
+}
+
+.sound-grid {
+    position: block;
+    background-color: #ff0;
+    width: 940px;
+    height: 2000px;
+    margin: 0 auto;
+}
+
+.sound-row {
+    position: relative;
+    left: 20px;
+}
+
+.sound {
+    width: 120px;
+    background-color: #000;
+    margin: 10px 30px 10px 30px;
+}
