@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, render_template
 from twilio.util import TwilioCapability
-from credentials import account_sid, auth_token, application_sid
+from credentials import *
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
