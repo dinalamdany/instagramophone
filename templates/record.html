@@ -8,8 +8,9 @@
             var connection=null;
             var token=null;
             $(document).ready(function(){
-                    Twilio.Device.setup(token, {"debug":true});
-                    $("#begin").click(function() {  
+                    Twilio.Device.setup({{token}}, {"debug":true});
+                    $("#begin").click(function() {
+			            console.log("begin");
                         Twilio.Device.connect();
                         });
                     $("#end").click(function() {  
