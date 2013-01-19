@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Record
+	action="process.py"
+	finishOnKey="#"
+	maxLength="30"
+	 />
+</Response>
