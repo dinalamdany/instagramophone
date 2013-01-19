@@ -13,7 +13,8 @@
                         Twilio.Device.connect();
                         });
                     $("#end").click(function() {  
-                        connection.sendDigits("#");
+           			Twilio.Device.disconnectAll();
+			         console.log("After send");
                         });
 
                     Twilio.Device.ready(function (device) {
@@ -35,10 +36,10 @@
                             toggleCallStatus();
                             });
 
-                    Twilio.Device.disconnect(function (conn) {
-                            $('#status').html('Recording ended<br/><a href="show_recordings.php">view recording list</a>');
+                    Twilio.Device.disconnect(function (conn) {                                            $('#status').html('Recording ended<br/><a href="show_recordings.php">view recording list</a>');
                             $('#status').css('color', 'black');
                             toggleCallStatus();
+
                             });
 
                     function toggleCallStatus(){
