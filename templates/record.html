@@ -2,14 +2,14 @@
 <html>
     <head>
         <title>Audio Recording</title>
-        <script type="text/javascript" src="//static.twilio.com/libs/twiliojs/1.1/twilio.min.js"></script>
+        <script type="text/javascript" src="http://static.twilio.com/libs/twiliojs/1.1/twilio.min.js"></script>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
         <script type="text/javascript">
             var connection=null;
             var token=null;
             $(document).ready(function(){
-                    Twilio.Device.setup(token, {"debug":true});
-                    $("#begin").click(function() {  
+                    Twilio.Device.setup("{{token}}", {"debug":true});
+                    $("#begin").click(function() {
                         Twilio.Device.connect();
                         });
                     $("#end").click(function() {  
@@ -42,8 +42,8 @@
                             });
 
                     function toggleCallStatus(){
-                        $('#call').toggle();
-                        $('#hangup').toggle();
+                        $('#begin').toggle();
+                        $('#end').toggle();
                     }
             });
 </script>
