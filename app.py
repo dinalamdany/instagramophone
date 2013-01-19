@@ -1,21 +1,28 @@
-import os
-from flask import Flask
-from flask import request
-from flask import render_template
-from flask import redirect
-import requests
+from credentials import account_sid, auth_token, application_sid
+from flask import Flask, request, render_template, redirect
+from twilio.util import TwilioCapability
 from urllib import urlopen 
 from xml.dom import minidom
-from twilio.util import TwilioCapability
+
+import os
+import requests
 import soundcloud
 
 atoken = '1-31322-33373233-661cb3c2f871ad2'
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
+def generate_token():
+    capability = TwilioCapability(account_sid, auth_token)
+    capability.allow_client_outgoing(application_sid)
+    test = capability.generate()
+    print(test)
+    #return capaddbility.generate()
+    return test
+
 @app.route('/')
-def hello():
-    return 'Hello World!'
+def index():
+    return render_template('index.html')
 
 @app.route('/process', methods=['POST'])
 def process():
@@ -23,9 +30,10 @@ def process():
     r = requests.get(url)
     #process r.content
 
-@app.route('/record')
+@app.route('/record', methods=['GET', 'POST'])
 def record():
-    return render_template('record.html')
+    twilio_token = generate_token() 
+    return render_template('record.html', token = twilio_token)
 
 @app.route('/login')
 def login():
