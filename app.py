@@ -1,4 +1,4 @@
-from credentials import account_sid, auth_token, application_sid
+from credentials import account_sid, auth_token, application_sid, client_token, client_id, client_secret
 from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
 from urllib import urlopen 
@@ -8,7 +8,6 @@ import os
 import requests
 import soundcloud
 
-atoken = '1-31322-33373233-661cb3c2f871ad2'
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
@@ -38,8 +37,8 @@ def record():
 @app.route('/login')
 def login():
     # create client object with app credentials
-    client = soundcloud.Client(client_id='a13d2648f3eb94cdea7b54b91bf66762',
-                           client_secret='0f6ba718694ea7c2885a085d6d0827d7',
+    client = soundcloud.Client(client_id=client_id,
+                           client_secret=client_secret,
                            redirect_uri='http://localhost:5000/token')
 
     # redirect user to authorize URL
@@ -48,8 +47,8 @@ def login():
 @app.route('/token')
 def token():
     # create client object with app credentials
-    client = soundcloud.Client(client_id='a13d2648f3eb94cdea7b54b91bf66762',
-                           client_secret='0f6ba718694ea7c2885a085d6d0827d7',
+    client = soundcloud.Client(client_id=client_id,
+                           client_secret=client_secret,
                            redirect_uri='http://localhost:5000/token')
     code = request.args.get('code', '')
     access_token = client.exchange_token(code)
@@ -57,7 +56,7 @@ def token():
 
 def upload(track_path):
     # create client object with access token
-    client = soundcloud.Client(access_token=atoken)
+    client = soundcloud.Client(access_token=client_token)
 
     # upload audio file
     track = client.post('/tracks', track={
@@ -69,9 +68,8 @@ def upload(track_path):
     # print track link
     return track.permalink_url
 
-@app.route('/widget')
 def widget(track_url):
-    client = soundcloud.Client(access_token=atoken)
+    client = soundcloud.Client(access_token=client_token)
     widget = requests.post('http://www.soundcloud.com/oembed', params={'url':track_url})
     new_page = requests.get(widget.url)
     xmldoc = minidom.parse(urlopen(widget.url))
