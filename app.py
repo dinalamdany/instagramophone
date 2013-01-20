@@ -1,15 +1,12 @@
-from credentials import account_sid, auth_token, application_sid, client_token, client_id, client_secret
+from credentials import account_sid, auth_token, application_sid, client_id, client_secret#client_token, client_id, client_secret
 from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
 from urllib import urlopen 
 from xml.dom import minidom
-from random import random
-from sox import do_all
-from time import sleep
+
 import os
 import requests
 import soundcloud
-
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -30,16 +27,7 @@ def index():
 def process():
     url = request.form['RecordingUrl']
     r = requests.get(url)
-
-    random_id = int(random() * 10**6)
-    with open('/tmp/' + str(random_id) + '_original.wav','wb') as f:
-        f.write( r.content )
-    upload( random_id )
-    audio_effects = do_all( random_id ) 
-    audio_change = ['reverse','short_echo','long_echo','fast','slow','glacial']
-    for i in range(len(audio_effects)):
-        upload( random_id, audio_change[i])
-        sleep(1)
+    #process r.content
 
 @app.route('/record', methods=['GET', 'POST'])
 def record():
@@ -66,18 +54,16 @@ def token():
     access_token = client.exchange_token(code)
     return 'hey bro: ' + access_token.access_token + 'lol'
 
-def upload( random_id, process='original'):
+def upload(track_path):
     # create client object with access token
-    track_path = '/tmp/' + str(random_id) + '_' + process + '.wav'
     client = soundcloud.Client(access_token=client_token)
 
-    with open(track_path, 'rb') as asset:
-        #with open('assets/img/ban.jpeg', 'rb') as artwork:
-            track = client.post('/tracks',track={
-                'title': 'Upload #: {}-{}'.format(random_id,process),
-                'asset_data': asset
-                #'artwork_data':artwork
-                })
+    # upload audio file
+    track = client.post('/tracks', track={
+        'title': 'This is my sound',
+        'asset_data': open(track_path, 'rb'),
+        'artwork_data': open('ban.jpeg', 'rb')
+    }) 
 
     # print track link
     return track.permalink_url
