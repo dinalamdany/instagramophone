@@ -182,11 +182,12 @@ def get_sound():
     track_url = queried_sound.url
     client = soundcloud.Client(client_id=client_id)
     track = client.get('/tracks/{}'.format(queried_sound.soundcloud_id))
+
     while (track.state != "finished"):
         track = client.get(queried_sound.soundcloud_id)
         print("This isn't ready")
         sleep(0.1)
-    return track_url
+    return str(track.id)
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
