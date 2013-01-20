@@ -3,6 +3,8 @@ from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
 from urllib import urlopen 
 from xml.dom import minidom
+import twilio.twiml
+from flask.ext.sqlalchemy import SQLAlchemy
 
 import os
 import requests
@@ -10,6 +12,8 @@ import soundcloud
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+db = SQLAlchemy(app)
 
 def generate_token():
     capability = TwilioCapability(account_sid, auth_token)
@@ -23,11 +27,19 @@ def generate_token():
 def index():
     return render_template('index.html')
 
-@app.route('/process', methods=['POST'])
-def process():
-    url = request.form['RecordingUrl']
-    r = requests.get(url)
-    #process r.content
+@app.route('/filter', methods=['GET', 'POST'])
+def filter():
+    return render_template('filter.html')
+
+@app.route('/recordtwilio', methods=['GET', 'POST'])
+def recordtwilio():
+    resp = twilio.twiml.Response()
+    resp.record(maxLength="30", action="/handle-recording")
+    return str(resp)
+
+@app.route('/handle-recording', methods=['GET', 'POST'])
+def handle_recording():
+    recording_url = request.values.get("RecordingUrl")
 
 @app.route('/record', methods=['GET', 'POST'])
 def record():

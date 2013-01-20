@@ -34,10 +34,13 @@
             var connection=null;
             var token=null;
             $(document).ready(function(){
+			        var id = Math.random();
                     Twilio.Device.setup("{{token}}", {"debug":true});
                     $("#begin").click(function() {
-                        Twilio.Device.connect();
-                        });
+                        Twilio.Device.connect({
+			               id: id
+                        })
+			        });
                     $("#end").click(function() {  
            			Twilio.Device.disconnectAll();
                         });
@@ -61,7 +64,7 @@
                             toggleCallStatus();
                             });
 
-                    Twilio.Device.disconnect(function (conn) {                                            $('#status').html('Recording ended<br/><a href="/widget.html">Take me to the filters</a>');
+                    Twilio.Device.disconnect(function (conn) {                                            $('#status').html('Recording ended<br/><a href="/filter">Take me to the filters</a>');
                             $('#status').css('color', 'black');
                             toggleCallStatus();
 
