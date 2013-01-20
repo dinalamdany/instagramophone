@@ -15,6 +15,30 @@ app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 db = SQLAlchemy(app)
 
+class Recording(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+
+    def __init__(self, id):
+        self.id = id
+
+    def __repr__(self):
+        return '<Recording %r>' % self.id
+
+class FilteredRecording(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    filter = db.Column(db.Integer)
+
+    recording_id = db.Column(db.Integer, db.ForeignKey('recording_id'))
+    recording = db.relationship('Recording', backref=db.backref('recordings',
+        lazy='dynamic'))
+
+    def __init__(self, recording):
+        self.filter = filter
+        self.recording = recording
+
+    def __repr__(self):
+        return '<FilteredRecording %r-%r>' % self.recording_id % self.filter
+
 def generate_token():
     capability = TwilioCapability(account_sid, auth_token)
     capability.allow_client_outgoing(application_sid)
