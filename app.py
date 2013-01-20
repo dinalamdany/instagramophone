@@ -3,6 +3,7 @@ from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
 from urllib import urlopen 
 from xml.dom import minidom
+from flask.ext.sqlalchemy import SQLAlchemy
 
 import os
 import requests
@@ -10,6 +11,8 @@ import soundcloud
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+db = SQLAlchemy(app)
 
 def generate_token():
     capability = TwilioCapability(account_sid, auth_token)
