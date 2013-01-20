@@ -3,10 +3,13 @@ from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
 from urllib import urlopen 
 from xml.dom import minidom
-
+from random import random
+from sox import do_all
+from time import sleep
 import os
 import requests
 import soundcloud
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -27,7 +30,16 @@ def index():
 def process():
     url = request.form['RecordingUrl']
     r = requests.get(url)
-    #process r.content
+
+    random_id = int(random()*10**6)
+    with open('/tmp/' + str(random_id) + '.wav','wb') as f:
+        f.write( r.content )
+    audio_effects = do_all( random_id ) 
+    audio_change = ['reverse','short_echo','long_echo','fast','slow','glacial']
+    for i in range(len(audio_effects)):
+        upload( '/tmp/' + str(random_id) + '_' + audio_effects[i] + '.wav',
+            random_id, audio_change[i])
+        sleep(1)
 
 @app.route('/record', methods=['GET', 'POST'])
 def record():
@@ -54,13 +66,13 @@ def token():
     access_token = client.exchange_token(code)
     return 'hey bro: ' + access_token.access_token + 'lol'
 
-def upload(track_path):
+def upload(track_path,random_id,process='original'):
     # create client object with access token
     client = soundcloud.Client(access_token=client_token)
 
     # upload audio file
     track = client.post('/tracks', track={
-        'title': 'This is my sound',
+        'title': 'Upload #: {} Track: {}'.format(random_id,process),
         'asset_data': open(track_path, 'rb'),
         'artwork_data': open('ban.jpeg', 'rb')
     }) 
