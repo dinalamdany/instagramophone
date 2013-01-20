@@ -70,14 +70,14 @@ def filter():
 @app.route('/recordtwilio', methods=['GET', 'POST'])
 def recordtwilio():
     resp = twilio.twiml.Response()
-    resp.record(maxLength="30", action="/handle-recording")
+    resp.record(maxLength="30", action="/handle-recording/{}".format(request.form['id']))
     return str(resp)
 
-@app.route('/handle-recording', methods=['GET', 'POST'])
-def handle_recording():
+@app.route('/handle-recording/<random_id>', methods=['GET', 'POST'])
+def handle_recording(random_id):
+    time.sleep(1)
     url = request.form['RecordingUrl']
     r = requests.get(url)
-    random_id = int(request.form['id'])
 
     recording = Recording(random_id)
     db.session.add(recording)
@@ -181,12 +181,13 @@ def get_sound():
         sleep(0.1)
     track_url = queried_sound.url
     client = soundcloud.Client(client_id=client_id)
-    track = client.get(queried_sound.soundcloud_id)
+    track = client.get('/tracks/{}'.format(queried_sound.soundcloud_id))
+
     while (track.state != "finished"):
         track = client.get(queried_sound.soundcloud_id)
         print("This isn't ready")
         sleep(0.1)
-    return track_url
+    return str(track.id)
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.

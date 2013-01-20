@@ -65,7 +65,7 @@
                             });
 
                     Twilio.Device.disconnect(function (conn) {
-            $('#status').html('Recording ended<br/><a href=\"/filter?id='+id + '\">Take me to the filters</a>');
+            $('#status').html('Recording ended<br/><a href=\"/filter?recording_id='+id + '\">Take me to the filters</a>');
                             $('#status').css('color', 'black');
                             toggleCallStatus();
 

@@ -15,9 +15,14 @@
             tracks[0] = "";
             tracks[1] = "";
             tracks[2] = "";
+            tracks[3] = "";
+            tracks[4] = "";
+            tracks[5] = "";
+            tracks[6] = "";
+            tracks[7] = "";
             var recording_id = getURLParameter("recording_id");
             var loading = new Image();
-            loading.src = "../static/assets/img/trex.jpg";
+            loading.src = "../static/assets/img/dino.gif";
 
             function switch_curr(num){
                 var audiobox = document.getElementById("audio-box");
@@ -28,9 +33,8 @@
                 }
                 if (tracks[current].length == 0){
                     audiobox.appendChild(loading);
-                    jQuery.get("http://localhost:5000/getsounds?filter=" + num + "&recording_id=" + recording_id, function(data){
+                    jQuery.get("/getsounds?filter=" + num + "&recording_id=" + recording_id, function(data){
                         tracks[num] = data;
-                        alert(num);
                         if (data.length > 0 && num == current){
                             $("#audio-box").html("");
                             while(audiobox.childNodes.length > 0){
@@ -67,27 +71,30 @@
         <h1>Filters</h1>
         <div class="row">
             <div class = "span2 filter">
-                <button class="filter-button" id="but-original" onclick="switch_curr(1)">Original</button>
+                <button class="filter-button" onclick="switch_curr(0)">Original</button>
             </div>
             <div class = "span2 filter">
-                <button class="filter-button" id="but-reverse" onclick="switch_curr(2)">Reverse</button>
+                <button class="filter-button" onclick="switch_curr(1)">Reverse</button>
             </div>
             <div class = "span2 filter">
-                <button class="filter-button">Short Echo</button>
+                <button class="filter-button" onclick="switch_curr(2)">Short Echo</button>
             </div>
             <div class = "span2 filter">
-                <button class="filter-button">Long Echo</button>
+                <button class="filter-button" onclick="switch_curr(3)">Long Echo</button>
             </div>
         </div>
         <div class="row">
             <div class = "span2 filter">
-                <button class="filter-button">Fast</button>
+                <button class="filter-button" onclick="switch_curr(4)">Fast</button>
             </div>
             <div class = "span2 filter">
-                <button class="filter-button">Slow</button>
+                <button class="filter-button" onclick="switch_curr(5)">Slow</button>
             </div>
             <div class = "span2 filter">
-                <button class="filter-button">Glacial</button>
+                <button class="filter-button" onclick="switch_curr(6)">Glacial</button>
+            </div>
+            <div class = "span2 filter">
+                <button class="filter-button" onclick="switch_curr(7)">Satanic</button>
             </div>
         </div>
     </div>
