@@ -48,15 +48,12 @@ def slow(audio_name):
 def glacial(audio_name):
 	command = 'sox /tmp/{0}_original.wav /tmp/{0}_{1}.wav {2}'.format(audio_name,'glacial','speed .5')
 	print command
-	print command
 	system(command)
 
 def satanic(audio_name):	# Just for Chris
-	command = 'sox /tmp/{0}_original.wav /tmp/{0}_{1}.wav {2}'.format(audio_name,'satanic','reverse : speed .5')
+	command = 'sox /tmp/{0}_original.wav /tmp/{0}_{1}.wav {2}'.format(audio_name,'satanic','reverse speed .5')
 	print command
 	system(command)
-
-
 
 
 
