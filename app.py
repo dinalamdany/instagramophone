@@ -87,6 +87,13 @@ def widget(track_url):
     xmldoc = minidom.parse(urlopen(widget.url))
     return xmldoc.getElementsByTagName("html")[0].firstChild.wholeText
 
+@app.route('/get-sound')
+    def get_sound():
+        # pull the soundcloud id from the sqlite3 database
+        # and pass it to ajax request to load widget from soundcloud
+        #track_id =
+
+
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
