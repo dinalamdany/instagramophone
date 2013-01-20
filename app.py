@@ -23,6 +23,10 @@ def generate_token():
 def index():
     return render_template('index.html')
 
+@app.route('/filter', methods=['GET', 'POST'])
+def filter():
+    return render_template('filter.html')
+
 @app.route('/process', methods=['POST'])
 def process():
     url = request.form['RecordingUrl']
