@@ -1,7 +1,7 @@
 @charset "utf-8";
 
 body {
-    background: url("pw_maze_white.png");
+    background: url("../img/pw_maze_white.png");
 }
 
 .user-head {
@@ -71,7 +71,7 @@ body {
     margin: 10px 30px 10px 30px;
 }
 
-.original {
+.current {
     width: 800px;
     margin: 0 auto;
 }
@@ -92,7 +92,7 @@ body {
     border-color: #ddd;
 }
 
-.filter img{
+.filter-button{
     position: relative;
     left: 7px;
     top: 7px;
