@@ -70,14 +70,14 @@ def filter():
 @app.route('/recordtwilio', methods=['GET', 'POST'])
 def recordtwilio():
     resp = twilio.twiml.Response()
-    resp.record(maxLength="30", action="/handle-recording")
+    resp.record(maxLength="30", action="/handle-recording/{}".format(request.form['id']))
     return str(resp)
 
-@app.route('/handle-recording', methods=['GET', 'POST'])
-def handle_recording():
+@app.route('/handle-recording/<random_id>', methods=['GET', 'POST'])
+def handle_recording(random_id):
+    time.sleep(1)
     url = request.form['RecordingUrl']
     r = requests.get(url)
-    random_id = int(request.form['id'])
 
     recording = Recording(random_id)
     db.session.add(recording)
