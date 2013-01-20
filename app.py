@@ -1,4 +1,4 @@
-from credentials import account_sid, auth_token, application_sid#, client_token, client_id, client_secret
+from credentials import account_sid, auth_token, application_sid, client_id, client_secret#client_token, client_id, client_secret
 from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
 from urllib import urlopen 

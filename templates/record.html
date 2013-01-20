@@ -40,7 +40,6 @@
                         });
                     $("#end").click(function() {  
            			Twilio.Device.disconnectAll();
-			         console.log("After send");
                         });
 
                     Twilio.Device.ready(function (device) {
@@ -62,8 +61,7 @@
                             toggleCallStatus();
                             });
 
-                    Twilio.Device.disconnect(function (conn) {                                            
-                      $('#status').html('Recording ended<br/><img src="../static/assets/img/listen.png"><a href="show_recordings.php"><p>View recording list</p></a>');
+                    Twilio.Device.disconnect(function (conn) {                                            $('#status').html('Recording ended<br/><a href="/widget.html">Take me to the filters</a>');
                             $('#status').css('color', 'black');
                             toggleCallStatus();
 
