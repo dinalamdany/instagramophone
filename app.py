@@ -27,6 +27,8 @@ class Recording(db.Model):
 class FilteredRecording(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     filter = db.Column(db.Integer)
+    finished = db.Column(db.Boolean)
+    url = db.Column(db.Text(200))
 
     recording_id = db.Column(db.Integer, db.ForeignKey('recording.id'))
     recording = db.relationship('Recording', backref=db.backref('recordings',
