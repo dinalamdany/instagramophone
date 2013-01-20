@@ -10,9 +10,60 @@
     </head>
 
     <body>
+	  <div id="fb-root"></div>
+	  <script>
+		// Additional JS functions here
+		window.fbAsyncInit = function() {
+		FB.init({
+		appId      : '488762664496101', // App ID
+		channelUrl : '//23.20.26.144:5000/channel.html', // Channel File
+		status     : true, // check login status
+		cookie     : true, // enable cookies to allow the server to access the session
+		xfbml      : true  // parse XFBML
+		});
+		
+		// Additional init code here
+FB.getLoginStatus(function(response) {
+    if (response.status === 'connected') {
+        // connected
+	testAPI();
+    } else if (response.status === 'not_authorized') {
+        // not_authorized
+        login();
+    } else {
+        // not_logged_in
+        login();
+    }
+});
+};		
 
-    <div class="original">
-       <h1>Original Audio</h1>
+	function login() {
+    FB.login(function(response) {
+        if (response.authResponse) {
+            // connected
+        } else {
+            // cancelled
+        }
+    });
+}
+
+function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+        console.log('Good to see you, ' + response.name + '.');
+    });
+}	
+		// Load the SDK Asynchronously
+		(function(d){
+		var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+		if (d.getElementById(id)) {return;}
+		js = d.createElement('script'); js.id = id; js.async = true;
+		js.src = "//connect.facebook.net/en_US/all.js";
+		ref.parentNode.insertBefore(js, ref);
+		}(document));
+	  </script>
+      <div class="original">
+		<h1>Original Audio</h1>
        <iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F75626831"></iframe>
     </div>
     <!--Sound Grid--!>
