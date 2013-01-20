@@ -35,12 +35,14 @@ class FilteredRecording(db.Model):
     recording = db.relationship('Recording', backref=db.backref('recordings',
         lazy='dynamic'))
 
-    def __init__(self, recording):
-        self.filter = filter
+    def __init__(self, recording, filter, finished=False, url=''):
         self.recording = recording
+        self.filter = filter
+	self.finished = finished
+	self.url = url
 
     def __repr__(self):
-        return '<FilteredRecording %r-%r>' % self.recording_id % self.filter
+        return '<FilteredRecording {}-{}>'.format(self.recording_id, self.filter)
 
 def generate_token():
     capability = TwilioCapability(account_sid, auth_token)
@@ -68,15 +70,37 @@ def recordtwilio():
 def handle_recording():
     url = request.form['RecordingUrl']
     r = requests.get(url)
-
     random_id = int(request.form['id'])
+
+    recording = Recording(random_id)
+    db.session.add(recording)
+    db.session.commit()
+
+    for i in range(len(['original'] + sox.audio_filter)):
+	filtered_rec = FilteredRecording(recording, i)
+	db.session.add(filtered_rec)
+    db.session.commit()
+
     with open('/tmp/' + str(random_id) + '_original.wav','wb') as f:
         f.write( r.content )
-    upload( random_id )                         # uploading original
+    permalink = upload( random_id )                         # uploading original
+    filtered_rec = FilteredRecording.query.filter_by(recording_id=random_id, filter=0).first()
+    filtered_rec.finished = True
+    filtered_rec.url = permalink
+    db.session.add(filtered_rec)
+    db.session.commit()
+
 
     audio_effects = sox.do_all( random_id )     # creating filtered audio
+    i = 1
     for effect in audio_effects:
-        upload( random_id, effect )
+        permalink = upload( random_id, effect )
+	filtered_rec = FilteredRecording.query.filter_by(recording_id=random_id, filter=i).first()
+	filtered_rec.finished = True
+	filtered_rec.url = permalink
+	db.session.add(filtered_rec)
+	db.session.commit()
+	i += 1
 
     return """  
     <?xml version="1.0" encoding="UTF-8"?>
