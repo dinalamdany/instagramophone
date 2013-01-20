@@ -1,4 +1,4 @@
-from credentials import account_sid, auth_token, application_sid#, client_token, client_id, client_secret
+from credentials import account_sid, auth_token, application_sid, client_token, client_id, client_secret
 from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
 from urllib import urlopen 
@@ -31,14 +31,14 @@ def process():
     url = request.form['RecordingUrl']
     r = requests.get(url)
 
-    random_id = int(random()*10**6)
-    with open('/tmp/' + str(random_id) + '.wav','wb') as f:
+    random_id = int(random() * 10**6)
+    with open('/tmp/' + str(random_id) + '_original.wav','wb') as f:
         f.write( r.content )
+    upload( random_id )
     audio_effects = do_all( random_id ) 
     audio_change = ['reverse','short_echo','long_echo','fast','slow','glacial']
     for i in range(len(audio_effects)):
-        upload( '/tmp/' + str(random_id) + '_' + audio_effects[i] + '.wav',
-            random_id, audio_change[i])
+        upload( random_id, audio_change[i])
         sleep(1)
 
 @app.route('/record', methods=['GET', 'POST'])
@@ -66,16 +66,18 @@ def token():
     access_token = client.exchange_token(code)
     return 'hey bro: ' + access_token.access_token + 'lol'
 
-def upload(track_path,random_id,process='original'):
+def upload( random_id, process='original'):
     # create client object with access token
+    track_path = '/tmp/' + str(random_id) + '_' + process + '.wav'
     client = soundcloud.Client(access_token=client_token)
 
-    # upload audio file
-    track = client.post('/tracks', track={
-        'title': 'Upload #: {} Track: {}'.format(random_id,process),
-        'asset_data': open(track_path, 'rb'),
-        'artwork_data': open('ban.jpeg', 'rb')
-    }) 
+    with open(track_path, 'rb') as asset:
+        #with open('assets/img/ban.jpeg', 'rb') as artwork:
+            track = client.post('/tracks',track={
+                'title': 'Upload #: {}-{}'.format(random_id,process),
+                'asset_data': asset
+                #'artwork_data':artwork
+                })
 
     # print track link
     return track.permalink_url
