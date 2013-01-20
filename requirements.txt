@@ -1,9 +1,12 @@
-Flask==0.9
+sk==0.9
 Jinja2==2.6
+PyJWT==0.1.2
 Werkzeug==0.8.3
 distribute==0.6.31
-wsgiref==0.1.2
-twilio>=3.3.6
-soundcloud
 fudge==1.0.3
+httplib2==0.7.7
 requests==0.14.2
+simplejson==3.0.7
+soundcloud==0.3.5
+twilio==3.4.2
+wsgiref==0.1.2
