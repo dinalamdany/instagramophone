@@ -1,9 +1,13 @@
-from credentials import account_sid, auth_token, application_sid, client_id, client_secret#client_token, client_id, client_secret
+from credentials import account_sid, auth_token, application_sid, client_id, client_secret, client_token, client_id, client_secret
 from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
-from urllib import urlopen 
-from xml.dom import minidom
-
+from urllib     import urlopen 
+from xml.dom    import minidom
+from random     import random
+import twilio.twiml
+from flask.ext.sqlalchemy import SQLAlchemy
+import sox
+import time
 import os
 import requests
 import soundcloud
@@ -11,6 +15,37 @@ import time
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+db = SQLAlchemy(app)
+
+class Recording(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+
+    def __init__(self, id):
+        self.id = id
+
+    def __repr__(self):
+        return '<Recording %r>' % self.id
+
+class FilteredRecording(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    filter = db.Column(db.Integer)
+    finished = db.Column(db.Boolean)
+    url = db.Column(db.Text(200))
+    soundcloud_id = db.Column(db.Integer)
+
+    recording_id = db.Column(db.Integer, db.ForeignKey('recording.id'))
+    recording = db.relationship('Recording', backref=db.backref('recordings',
+        lazy='dynamic'))
+
+    def __init__(self, recording, filter, finished=False, url=''):
+        self.recording = recording
+        self.filter = filter
+	self.finished = finished
+	self.url = url
+
+    def __repr__(self):
+        return '<FilteredRecording {}-{}>'.format(self.recording_id, self.filter)
 
 def generate_token():
     capability = TwilioCapability(account_sid, auth_token)
@@ -28,11 +63,63 @@ def filter():
 def index():
     return render_template('index.html')
 
-@app.route('/process', methods=['POST'])
-def process():
+@app.route('/filter', methods=['GET', 'POST'])
+def filter():
+    return render_template('filter.html')
+
+@app.route('/recordtwilio', methods=['GET', 'POST'])
+def recordtwilio():
+    resp = twilio.twiml.Response()
+    resp.record(maxLength="30", action="/handle-recording")
+    return str(resp)
+
+@app.route('/handle-recording', methods=['GET', 'POST'])
+def handle_recording():
     url = request.form['RecordingUrl']
     r = requests.get(url)
-    #process r.content
+    random_id = int(request.form['id'])
+
+    recording = Recording(random_id)
+    db.session.add(recording)
+    db.session.commit()
+
+    for i in range(len(['original'] + sox.audio_filter)):
+	filtered_rec = FilteredRecording(recording, i)
+	db.session.add(filtered_rec)
+    db.session.commit()
+
+    with open('/tmp/' + str(random_id) + '_original.wav','wb') as f:
+        f.write( r.content )
+    permalink, s_id = upload( random_id )                         # uploading original
+    filtered_rec = FilteredRecording.query.filter_by(recording_id=random_id, filter=0).first()
+    filtered_rec.finished = True
+    filtered_rec.url = permalink
+    filtered_rec.soundcloud_id = s_id
+    db.session.add(filtered_rec)
+    db.session.commit()
+
+
+    audio_effects = sox.do_all( random_id )     # creating filtered audio
+    i = 1
+    for effect in audio_effects:
+        permalink, s_id = upload( random_id, effect )
+	filtered_rec = FilteredRecording.query.filter_by(recording_id=random_id, filter=i).first()
+	filtered_rec.finished = True
+	filtered_rec.url = permalink
+	filtered_rec.soundcloud_id = s_id
+	db.session.add(filtered_rec)
+	db.session.commit()
+	i += 1
+
+    return """  
+    <?xml version="1.0" encoding="UTF-8"?>
+    <Response>
+    </Response>
+    """
+
+@app.route('/channel.html', methods=['GET', 'POST'])
+def channel():
+    return render_template('channel.html')
 
 @app.route('/record', methods=['GET', 'POST'])
 def record():
@@ -45,7 +132,6 @@ def login():
     client = soundcloud.Client(client_id=client_id,
                            client_secret=client_secret,
                            redirect_uri='http://localhost:5000/token')
-
     # redirect user to authorize URL
     return redirect(client.authorize_url())
 
@@ -57,21 +143,22 @@ def token():
                            redirect_uri='http://localhost:5000/token')
     code = request.args.get('code', '')
     access_token = client.exchange_token(code)
-    return 'hey bro: ' + access_token.access_token + 'lol'
+    return 'hey bro: ' + access_token.access_token + ' lol'
 
-def upload(track_path):
+def upload(random_id, process = 'original'):
     # create client object with access token
     client = soundcloud.Client(access_token=client_token)
-
+    track_path = '/tmp/' + str(random_id) + '_' + process + '.wav'
     # upload audio file
-    track = client.post('/tracks', track={
-        'title': 'This is my sound',
-        'asset_data': open(track_path, 'rb'),
-        'artwork_data': open('ban.jpeg', 'rb')
-    }) 
-
+    with open(track_path,'rb') as track:
+        with open('assets/img/ban.jpeg','rb') as banana:
+            track = client.post('/tracks', track={
+                'title': 'Upload #: {}-{}'.format(random_id,process),
+                'asset_data': track,
+                'artwork_data': banana
+            })  
     # print track link
-    return track.permalink_url
+    return track.permalink_url, track.id
 
 def widget(track_url):
     client = soundcloud.Client(access_token=client_token)
@@ -79,6 +166,27 @@ def widget(track_url):
     new_page = requests.get(widget.url)
     xmldoc = minidom.parse(urlopen(widget.url))
     return xmldoc.getElementsByTagName("html")[0].firstChild.wholeText
+
+@app.route('/getsounds')
+    def get_sound():
+        rec_id = request.values.get('recording_id')
+        filter_id = request.values.get('filter')
+        # pull the soundcloud id from the sqlite3 database
+        # and pass it to ajax request to load widget from soundcloud
+        # while track is not uploaded, loop and let user know not uploaded
+        queried_sound = FilteredRecording.query.filter_by(recording_id=rec_id, filter=filter_id).first()
+        while (queried_sound.finished != True):
+            queried_sound = FilteredRecording.query.filter_by(recording_id=rec_id, filter=filter_id).first()
+            print("This audio file isn't done yet")
+            sleep(0.1)
+        track_url = queried_sound.url
+        client = soundcloud.Client(client_id=client_id)
+        track = client.get(queried_sound.soundcloud_id)
+        while (track.state != "finished"):
+            track = client.get(queried_sound.soundcloud_id)
+            print("This isn't ready")
+            sleep(0.1)
+        return track_url
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
