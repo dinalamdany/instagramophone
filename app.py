@@ -111,6 +111,10 @@ def handle_recording():
     </Response>
     """
 
+@app.route('/channel.html', methods=['GET', 'POST'])
+def channel():
+    return render_template('channel.html')
+
 @app.route('/record', methods=['GET', 'POST'])
 def record():
     twilio_token = generate_token() 
