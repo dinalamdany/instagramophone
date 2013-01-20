@@ -7,6 +7,7 @@ from random     import random
 import twilio.twiml
 from flask.ext.sqlalchemy import SQLAlchemy
 import sox
+import time
 import os
 import requests
 import soundcloud
@@ -137,7 +138,7 @@ def token():
                            redirect_uri='http://localhost:5000/token')
     code = request.args.get('code', '')
     access_token = client.exchange_token(code)
-    return 'hey bro: ' + access_token.access_token + 'lol'
+    return 'hey bro: ' + access_token.access_token + ' lol'
 
 def upload(random_id, process = 'original'):
     # create client object with access token
@@ -161,12 +162,26 @@ def widget(track_url):
     xmldoc = minidom.parse(urlopen(widget.url))
     return xmldoc.getElementsByTagName("html")[0].firstChild.wholeText
 
-@app.route('/get-sound')
+@app.route('/getsounds')
     def get_sound():
+        rec_id = request.values.get('recording_id')
+        filter_id = request.values.get('filter')
         # pull the soundcloud id from the sqlite3 database
         # and pass it to ajax request to load widget from soundcloud
-        #track_id =
-
+        # while track is not uploaded, loop and let user know not uploaded
+        queried_sound = FilteredRecording.query.filter_by(recording_id=rec_id, filter=filter_id).first()
+        while (queried_sound.finished != True):
+            queried_sound = FilteredRecording.query.filter_by(recording_id=rec_id, filter=filter_id).first()
+            print("This audio file isn't done yet")
+            sleep(0.1)
+        track_url = queried_sound.url
+        client = soundcloud.Client(client_id=client_id)
+        track = client.get(queried_sound.soundcloud_id)
+        while (track.state != "finished"):
+            track = client.get(queried_sound.soundcloud_id)
+            print("This isn't ready")
+            sleep(0.1)
+        return track_url
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
