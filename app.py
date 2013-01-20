@@ -3,6 +3,7 @@ from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
 from urllib import urlopen 
 from xml.dom import minidom
+import twilio.twiml
 
 import os
 import requests
@@ -27,11 +28,15 @@ def index():
 def filter():
     return render_template('filter.html')
 
-@app.route('/process', methods=['POST'])
-def process():
-    url = request.form['RecordingUrl']
-    r = requests.get(url)
-    #process r.content
+@app.route('/recordtwilio')
+def recordtwilio():
+    resp = twilio.twiml.Response()
+    resp.record(maxLength="30", action="/handle-recording")
+    return str(resp)
+
+@app.route('/handle-recording', methods=['GET', 'POST'])
+def handle_recording():
+    recording_url = request.values.get("RecordingUrl")
 
 @app.route('/record', methods=['GET', 'POST'])
 def record():

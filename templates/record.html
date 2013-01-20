@@ -34,10 +34,13 @@
             var connection=null;
             var token=null;
             $(document).ready(function(){
+			        var id = Math.random();
                     Twilio.Device.setup("{{token}}", {"debug":true});
                     $("#begin").click(function() {
-                        Twilio.Device.connect();
-                        });
+                        Twilio.Device.connect({
+			               id: id
+                        })
+			        });
                     $("#end").click(function() {  
            			Twilio.Device.disconnectAll();
                         });
