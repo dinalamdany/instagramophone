@@ -28,7 +28,7 @@ class FilteredRecording(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     filter = db.Column(db.Integer)
 
-    recording_id = db.Column(db.Integer, db.ForeignKey('recording_id'))
+    recording_id = db.Column(db.Integer, db.ForeignKey('recording.id'))
     recording = db.relationship('Recording', backref=db.backref('recordings',
         lazy='dynamic'))
 
