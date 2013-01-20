@@ -4,7 +4,6 @@ from twilio.util import TwilioCapability
 from urllib     import urlopen 
 from xml.dom    import minidom
 from random     import random
-from time       import sleep
 import twilio.twiml
 from flask.ext.sqlalchemy import SQLAlchemy
 import sox
@@ -70,7 +69,7 @@ def handle_recording():
     url = request.form['RecordingUrl']
     r = requests.get(url)
 
-    random_id = int(random() * 10**6)
+    random_id = int(request.form['id'])
     with open('/tmp/' + str(random_id) + '_original.wav','wb') as f:
         f.write( r.content )
     upload( random_id )                         # uploading original
@@ -78,7 +77,6 @@ def handle_recording():
     audio_effects = sox.do_all( random_id )     # creating filtered audio
     for effect in audio_effects:
         upload( random_id, effect )
-        sleep(1)
 
     return """  
     <?xml version="1.0" encoding="UTF-8"?>
