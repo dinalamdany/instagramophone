@@ -30,6 +30,7 @@ class FilteredRecording(db.Model):
     filter = db.Column(db.Integer)
     finished = db.Column(db.Boolean)
     url = db.Column(db.Text(200))
+    soundcloud_id = db.Column(db.Integer)
 
     recording_id = db.Column(db.Integer, db.ForeignKey('recording.id'))
     recording = db.relationship('Recording', backref=db.backref('recordings',
@@ -83,10 +84,11 @@ def handle_recording():
 
     with open('/tmp/' + str(random_id) + '_original.wav','wb') as f:
         f.write( r.content )
-    permalink = upload( random_id )                         # uploading original
+    permalink, s_id = upload( random_id )                         # uploading original
     filtered_rec = FilteredRecording.query.filter_by(recording_id=random_id, filter=0).first()
     filtered_rec.finished = True
     filtered_rec.url = permalink
+    filtered_rec.soundcloud_id = s_id
     db.session.add(filtered_rec)
     db.session.commit()
 
@@ -94,10 +96,11 @@ def handle_recording():
     audio_effects = sox.do_all( random_id )     # creating filtered audio
     i = 1
     for effect in audio_effects:
-        permalink = upload( random_id, effect )
+        permalink, s_id = upload( random_id, effect )
 	filtered_rec = FilteredRecording.query.filter_by(recording_id=random_id, filter=i).first()
 	filtered_rec.finished = True
 	filtered_rec.url = permalink
+	filtered_rec.soundcloud_id = s_id
 	db.session.add(filtered_rec)
 	db.session.commit()
 	i += 1
@@ -145,7 +148,7 @@ def upload(random_id, process = 'original'):
                 'artwork_data': banana
             })  
     # print track link
-    return track.permalink_url
+    return track.permalink_url, track.id
 
 def widget(track_url):
     client = soundcloud.Client(access_token=client_token)
