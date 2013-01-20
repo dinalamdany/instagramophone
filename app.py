@@ -7,6 +7,7 @@ from xml.dom import minidom
 import os
 import requests
 import soundcloud
+import time
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -18,6 +19,10 @@ def generate_token():
     print(test)
     #return capaddbility.generate()
     return test
+
+@app.route('/filter')
+def filter():
+    return render_template('filter.html')
 
 @app.route('/')
 def index():

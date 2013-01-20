@@ -4,47 +4,91 @@
         <meta charset="utf-8">
         <title>Instagramophone</title>
         
-        <link href="css/bootstrap.css" rel="stylesheet">
-        <link href="css/bootstrap-responsive.css" rel="stylesheet">
-        <link href="attempt.css" rel="stylesheet">
+        <link href="../static/assets/css/bootstrap.css" rel="stylesheet">
+        <link href="../static/assets/css/bootstrap-responsive.css" rel="stylesheet">
+        <link href="../static/assets/css/attempt.css" rel="stylesheet">
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> 
+        <script type="text/javascript">
+            
+            var current = 1;
+            var tracks = new Array();
+            tracks[0] = "";
+            tracks[1] = "";
+            tracks[2] = "";
+            var recording_id = getURLParameter("recording_id");
+            var loading = new Image();
+            loading.src = "../static/assets/img/trex.jpg";
+
+            function switch_curr(num){
+                var audiobox = document.getElementById("audio-box");
+                current = num;
+                $("#audio-box").html("");
+                while (audiobox.childNodes.length > 0){
+                    audiobox.removeChild(audiobox.childNodes[0]);
+                }
+                if (tracks[current].length == 0){
+                    audiobox.appendChild(loading);
+                    jQuery.get("http://localhost:5000/getsounds?filter=" + num + "&recording_id=" + recording_id, function(data){
+                        tracks[num] = data;
+                        alert(num);
+                        if (data.length > 0 && num == current){
+                            $("#audio-box").html("");
+                            while(audiobox.childNodes.length > 0){
+                                audiobox.removeChild(audiobox.childNodes[0]);
+                            }
+                            $("#audio-box").html("<iframe width=\"100%\" height=\"166\" scrolling=\"no\" frameborder=\"no\" src=\"https://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F" + tracks[current] + "\"></iframe>");
+                        }
+                    })
+
+                }
+                else{
+                     $("#audio-box").html("<iframe width=\"100%\" height=\"166\" scrolling=\"no\" frameborder=\"no\" src=\"https://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F" + tracks[current] + "\"></iframe>");
+                }
+            
+            }
+
+
+            function getURLParameter(name) {
+                return decodeURI(
+                (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
+            }
+        </script>
+        
     </head>
 
     <body>
 
-    <div class="original">
-       <h1>Original Audio</h1>
-       <iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F75626831"></iframe>
+    <div class="current">
+       <h1 id="audio-title">Original Audio</h1>
+       <div id="audio-box"></div>
     </div>
     <!--Sound Grid--!>
     <div class="filter-list">
+        <h1>Filters</h1>
         <div class="row">
-            <h1>Filters</h1>
-                <div class = "span2 filter">
-                   <img src="../ban.jpeg" />
-                </div>
-                <div class = "span2 filter">
-                   <img src="../ban.jpeg" />
-                </div>
-                <div class = "span2 filter">
-                   <img src="../ban.jpeg" />
-                </div>
-                <div class = "span2 filter">
-                   <img src="../ban.jpeg" />
-                </div>
+            <div class = "span2 filter">
+                <button class="filter-button" id="but-original" onclick="switch_curr(1)">Original</button>
+            </div>
+            <div class = "span2 filter">
+                <button class="filter-button" id="but-reverse" onclick="switch_curr(2)">Reverse</button>
+            </div>
+            <div class = "span2 filter">
+                <button class="filter-button">Short Echo</button>
+            </div>
+            <div class = "span2 filter">
+                <button class="filter-button">Long Echo</button>
+            </div>
         </div>
         <div class="row">
-                <div class = "span2 filter">
-                   <img src="../ban.jpeg" />
-                </div>
-                <div class = "span2 filter">
-                   <img src="../ban.jpeg" />
-                </div>
-                <div class = "span2 filter">
-                   <img src="../ban.jpeg" />
-                </div>
-                <div class = "span2 filter">
-                   <img src="../ban.jpeg" />
-                </div>
+            <div class = "span2 filter">
+                <button class="filter-button">Fast</button>
+            </div>
+            <div class = "span2 filter">
+                <button class="filter-button">Slow</button>
+            </div>
+            <div class = "span2 filter">
+                <button class="filter-button">Glacial</button>
+            </div>
         </div>
     </div>
     </body>
