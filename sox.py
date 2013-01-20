@@ -3,19 +3,21 @@ from os 	import system
 from sys 	import argv
 from string import replace
 
-audio_change = ['reverse','short_echo','long_echo','fast','slow','glacial']
+audio_filter = ['reverse','short_echo','long_echo','fast','slow','glacial']
 
 def do_all(random_id):
 	audio_name = str(random_id)
+
 	reverse(audio_name)
 	short_echo(audio_name)
 	long_echo(audio_name)		
 	fast(audio_name)	
 	slow(audio_name)		
 	glacial(audio_name)	
-	for effect in audio_change:
+	
+	for effect in audio_filter:
 		effect = '/tmp/' + audio_name + '_' + effect + '.wav'
-	return audio_change
+	return audio_filter
 
 # 'sox {}.wav /tmp/{}_{} {}'
 
@@ -23,6 +25,7 @@ def reverse(audio_name):
 	command = 'sox /tmp/'+audio_name+'_original.wav /tmp/'+audio_name+'_reverse.wav '
 	command += 'reverse'
 	#command = 'sox {}.wav /tmp/{}_{} {}'.format(audio_name,audio_name,)
+	print command
 	system(command)
 
 def short_echo(audio_name):

@@ -1,11 +1,13 @@
-from credentials import account_sid, auth_token, application_sid, client_id, client_secret#client_token, client_id, client_secret
+from credentials import account_sid, auth_token, application_sid, client_id, client_secret, client_token, client_id, client_secret
 from flask import Flask, request, render_template, redirect
 from twilio.util import TwilioCapability
-from urllib import urlopen 
-from xml.dom import minidom
+from urllib     import urlopen 
+from xml.dom    import minidom
+from random     import random
+from time       import sleep
 import twilio.twiml
 from flask.ext.sqlalchemy import SQLAlchemy
-
+import sox
 import os
 import requests
 import soundcloud
@@ -39,7 +41,24 @@ def recordtwilio():
 
 @app.route('/handle-recording', methods=['GET', 'POST'])
 def handle_recording():
-    recording_url = request.values.get("RecordingUrl")
+    url = request.form['RecordingUrl']
+    r = requests.get(url)
+
+    random_id = int(random() * 10**6)
+    with open('/tmp/' + str(random_id) + '_original.wav','wb') as f:
+        f.write( r.content )
+    upload( random_id )                         # uploading original
+
+    audio_effects = sox.do_all( random_id )     # creating filtered audio
+    for effect in audio_effects:
+        upload( random_id, effect )
+        sleep(1)
+
+    return """  
+    <?xml version="1.0" encoding="UTF-8"?>
+    <Response>
+    </Response>
+    """
 
 @app.route('/record', methods=['GET', 'POST'])
 def record():
@@ -52,7 +71,6 @@ def login():
     client = soundcloud.Client(client_id=client_id,
                            client_secret=client_secret,
                            redirect_uri='http://localhost:5000/token')
-
     # redirect user to authorize URL
     return redirect(client.authorize_url())
 
@@ -66,17 +84,18 @@ def token():
     access_token = client.exchange_token(code)
     return 'hey bro: ' + access_token.access_token + 'lol'
 
-def upload(track_path):
+def upload(random_id, process = 'original'):
     # create client object with access token
     client = soundcloud.Client(access_token=client_token)
-
+    track_path = '/tmp/' + str(random_id) + '_' + process + '.wav'
     # upload audio file
-    track = client.post('/tracks', track={
-        'title': 'This is my sound',
-        'asset_data': open(track_path, 'rb'),
-        'artwork_data': open('ban.jpeg', 'rb')
-    }) 
-
+    with open(track_path,'rb') as track:
+        with open('assets/img/ban.jpeg','rb') as banana:
+            track = client.post('/tracks', track={
+                'title': 'Upload #: {}-{}'.format(random_id,process),
+                'asset_data': track,
+                'artwork_data': banana
+            })  
     # print track link
     return track.permalink_url
 
