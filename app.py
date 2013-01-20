@@ -108,7 +108,7 @@ def handle_recording():
     </Response>
     """
 
-@app.route('/channel', methods=['GET', 'POST'])
+@app.route('/channel.html', methods=['GET', 'POST'])
 def channel():
     return render_template('channel.html')
 
