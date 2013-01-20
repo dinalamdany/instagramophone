@@ -9,10 +9,10 @@ def do_all(random_id):
 	audio_name = str(random_id)
 	reverse(audio_name)
 	short_echo(audio_name)
-	#long_echo(audio_name)		#Nate is working on this		
-	#fast(audio_name)			#Nate is working on this	
-	#slow(audio_name)			#Nate is working on this	
-	#glacial(audio_name)		#Nate is working on this		
+	long_echo(audio_name)		
+	fast(audio_name)	
+	slow(audio_name)		
+	glacial(audio_name)	
 	for effect in audio_change:
 		effect = '/tmp/' + audio_name + '_' + effect + '.wav'
 	return audio_change
@@ -37,15 +37,15 @@ def long_echo(audio_name):
 
 def fast(audio_name):
 	command = 'sox /tmp/'+audio_name+'_original.wav /tmp/'+audio_name+'_fast.wav '
-	command += 'rate 1.2'
+	command += 'speed 1.2'
 	system(command)
 
 def slow(audio_name):
 	command = 'sox /tmp/'+audio_name+'_original.wav /tmp/'+audio_name+'_slow.wav '
-	command += 'rate .8'
+	command += 'speed .8'
 	system(command)
 
 def glacial(audio_name):
 	command = 'sox /tmp/'+audio_name+'_original.wav /tmp/'+audio_name+'_glacial.wav '
-	command += 'rate .5'
+	command += 'speed .5'
 	system(command)
