@@ -31,7 +31,7 @@ def index():
 def filter():
     return render_template('filter.html')
 
-@app.route('/recordtwilio')
+@app.route('/recordtwilio', methods=['GET', 'POST'])
 def recordtwilio():
     resp = twilio.twiml.Response()
     resp.record(maxLength="30", action="/handle-recording")
