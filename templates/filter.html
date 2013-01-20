@@ -28,7 +28,7 @@
                 }
                 if (tracks[current].length == 0){
                     audiobox.appendChild(loading);
-                    jQuery.get("http://localhost:5000/getsounds?filter=" + num + "&recording_id=" + recording_id, function(data){
+                    jQuery.get("/getsounds?filter=" + num + "&recording_id=" + recording_id, function(data){
                         tracks[num] = data;
                         alert(num);
                         if (data.length > 0 && num == current){
